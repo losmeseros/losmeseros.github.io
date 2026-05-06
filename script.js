@@ -3,38 +3,17 @@
  *
  * This script handles dynamic content updates and user interactions for the portfolio website.
  * It includes functionality for setting the current year in the footer, displaying the last edited date,
- * and toggling between light and dark themes.
+ * toggling between light and dark themes, and keeping navigation consistent across pages.
  */
 
-// ========================================
-// DOM Element References
-// ========================================
+const THEME_STORAGE_KEY = 'portfolioTheme';
+
+let yearSpan = null;
+let themeToggle = null;
+let lastEditedSpan = null;
 
 /**
- * Reference to the span element that displays the current year in the footer.
- * @type {HTMLElement|null}
- */
-const yearSpan = document.getElementById("year");
-
-/**
- * Reference to the button that toggles the theme (light/dark mode).
- * @type {HTMLElement|null}
- */
-const themeToggle = document.getElementById("theme-toggle");
-
-/**
- * Reference to the span element that displays the last edited date in the footer.
- * @type {HTMLElement|null}
- */
-const lastEditedSpan = document.getElementById("last-edited");
-
-// ========================================
-// Initialization Functions
-// ========================================
-
-/**
- * Sets the current year in the copyright section of the footer.
- * Uses the current date to dynamically update the year display.
+ * Updates the footer year to the current calendar year.
  */
 function setCurrentYear() {
   if (yearSpan) {
@@ -43,55 +22,99 @@ function setCurrentYear() {
 }
 
 /**
- * Sets the last edited date in the footer.
- * Displays the current date in MM/DD/YYYY format (US locale).
+ * Uses the browser document metadata to show the last modified date for the current page.
  */
 function setLastEditedDate() {
   if (lastEditedSpan) {
-    lastEditedSpan.textContent = new Date().toLocaleDateString('en-US');
+    const modifiedDate = document.lastModified ? new Date(document.lastModified) : new Date();
+    lastEditedSpan.textContent = modifiedDate.toLocaleDateString('en-US');
   }
 }
 
-// ========================================
-// Event Handlers
-// ========================================
+/**
+ * Apply the saved theme preference from localStorage.
+ */
+function applySavedTheme() {
+  const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+  } else {
+    document.body.classList.remove('dark-mode');
+  }
+
+  updateThemeToggleText();
+}
 
 /**
- * Toggles the dark mode class on the body element and updates the theme toggle button text.
- * This function is attached to the theme toggle button's click event.
+ * Update the theme toggle button label to match the current theme state.
+ */
+function updateThemeToggleText() {
+  if (!themeToggle) {
+    return;
+  }
+
+  if (document.body.classList.contains('dark-mode')) {
+    themeToggle.textContent = 'Switch to Light Mode';
+  } else {
+    themeToggle.textContent = 'Switch to Dark Mode';
+  }
+}
+
+/**
+ * Toggle dark mode and remember the preference in localStorage.
  */
 function toggleTheme() {
-  document.body.classList.toggle("dark-mode");
+  document.body.classList.toggle('dark-mode');
 
-  if (document.body.classList.contains("dark-mode")) {
-    themeToggle.textContent = "Switch to Light Mode";
+  if (document.body.classList.contains('dark-mode')) {
+    window.localStorage.setItem(THEME_STORAGE_KEY, 'dark');
   } else {
-    themeToggle.textContent = "Switch to Dark Mode";
+    window.localStorage.setItem(THEME_STORAGE_KEY, 'light');
   }
-}
 
-// ========================================
-// Event Listeners Setup
-// ========================================
+  updateThemeToggleText();
+}
 
 /**
- * Initializes the script by setting up dynamic content and event listeners.
- * This function is called when the DOM is fully loaded.
+ * Ensure navigation links show the active page automatically.
+ */
+function setActiveNavigation() {
+  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+  const navLinks = document.querySelectorAll('.nav-links a');
+
+  navLinks.forEach((link) => {
+    const linkHref = link.getAttribute('href');
+
+    if (!linkHref) {
+      return;
+    }
+
+    if (linkHref === currentPage || (currentPage === '' && linkHref === 'index.html')) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+    }
+  });
+}
+
+/**
+ * Sets up the page once the DOM is ready.
  */
 function initializeScript() {
-  // Set dynamic footer content
+  yearSpan = document.getElementById('year');
+  themeToggle = document.getElementById('theme-toggle');
+  lastEditedSpan = document.getElementById('last-edited');
+
   setCurrentYear();
   setLastEditedDate();
+  applySavedTheme();
+  setActiveNavigation();
 
-  // Attach event listener for theme toggle
   if (themeToggle) {
-    themeToggle.addEventListener("click", toggleTheme);
+    themeToggle.addEventListener('click', toggleTheme);
   }
 }
 
-// ========================================
-// Script Execution
-// ========================================
+document.addEventListener('DOMContentLoaded', initializeScript);
 
-// Run initialization when the DOM content is loaded
-document.addEventListener("DOMContentLoaded", initializeScript);
