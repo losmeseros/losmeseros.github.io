@@ -110,10 +110,48 @@ function initializeScript() {
   setLastEditedDate();
   applySavedTheme();
   setActiveNavigation();
+  initializeCarousel();
 
   if (themeToggle) {
     themeToggle.addEventListener('click', toggleTheme);
   }
+}
+
+let carouselIndex = 0;
+let carouselSlides = [];
+let carouselPrev = null;
+let carouselNext = null;
+
+function showCarouselSlide(index) {
+  if (!carouselSlides.length) {
+    return;
+  }
+
+  carouselSlides.forEach((slide, slideIndex) => {
+    slide.classList.toggle('active', slideIndex === index);
+  });
+}
+
+function initializeCarousel() {
+  carouselSlides = Array.from(document.querySelectorAll('.carousel-slide'));
+  carouselPrev = document.getElementById('carousel-prev');
+  carouselNext = document.getElementById('carousel-next');
+
+  if (!carouselSlides.length || !carouselPrev || !carouselNext) {
+    return;
+  }
+
+  showCarouselSlide(carouselIndex);
+
+  carouselPrev.addEventListener('click', () => {
+    carouselIndex = (carouselIndex - 1 + carouselSlides.length) % carouselSlides.length;
+    showCarouselSlide(carouselIndex);
+  });
+
+  carouselNext.addEventListener('click', () => {
+    carouselIndex = (carouselIndex + 1) % carouselSlides.length;
+    showCarouselSlide(carouselIndex);
+  });
 }
 
 document.addEventListener('DOMContentLoaded', initializeScript);
