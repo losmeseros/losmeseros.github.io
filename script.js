@@ -99,6 +99,30 @@ function setActiveNavigation() {
 }
 
 /**
+ * Slideshow functionality for Los Meseros section.
+ */
+function initializeSlideshow() {
+  const slides = document.querySelectorAll('.slide');
+  if (slides.length === 0) return;
+
+  let currentSlide = 0;
+
+  function showSlide(index) {
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('active', i === index);
+    });
+  }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+  }
+
+  // Start slideshow
+  setInterval(nextSlide, 3000); // Change slide every 3 seconds
+}
+
+/**
  * Sets up the page once the DOM is ready.
  */
 function initializeScript() {
@@ -110,6 +134,7 @@ function initializeScript() {
   setLastEditedDate();
   applySavedTheme();
   setActiveNavigation();
+  initializeSlideshow();
 
   if (themeToggle) {
     themeToggle.addEventListener('click', toggleTheme);
