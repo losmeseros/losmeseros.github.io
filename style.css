@@ -112,15 +112,16 @@ body.dark-mode header::after {
 }
 
 .nav {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 1rem;
   padding: 1rem 0;
 }
 
 .branding {
-  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
 }
 
@@ -601,7 +602,7 @@ textarea {
 }
 
 body:not(.dark-mode) .slogan-container {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(46, 39, 33, 0.9);
   backdrop-filter: blur(10px);
   border: 2px solid rgba(138, 106, 71, 0.3);
   border-radius: 12px;
